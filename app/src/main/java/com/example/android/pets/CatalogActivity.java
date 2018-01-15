@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,8 +53,7 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
         mDBHlper=new PetDbHelper(this);
-        PetDbHelper mDbHelper = new PetDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        displayDatabaseInfo();
     }
     private void displayDatabaseInfo() {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
@@ -80,12 +80,12 @@ public class CatalogActivity extends AppCompatActivity {
     private void insertPet(){
         SQLiteDatabase db=mDBHlper.getWritableDatabase();
         ContentValues contentValues=new ContentValues();
-        contentValues.put(petContract.petEntry.TABLE_NAME,"toto");
         contentValues.put(petContract.petEntry.COLUMN_PET_NAME, "Toto");
         contentValues.put(petContract.petEntry.COLUMN_PET_BREED, "Terrier");
         contentValues.put(petContract.petEntry.COLUMN_PET_GENDER,petContract.petEntry.GENDER_MALE);
         contentValues.put(petContract.petEntry.COLUMN_PET_WEIGHT, 7);
         long rowId=db.insert(petContract.petEntry.TABLE_NAME,null,contentValues);
+        Log.v("row Id","effected"+rowId);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -101,7 +101,8 @@ public class CatalogActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-            {insertPet();
+            {
+                insertPet();
                 displayDatabaseInfo();}
                 return true;
             // Respond to a click on the "Delete all entries" menu option
