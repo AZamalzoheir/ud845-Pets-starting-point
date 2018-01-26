@@ -15,10 +15,15 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,14 +31,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.pets.data.PetDbHelper;
 import com.example.android.pets.data.petContract;
 
 /**
  * Allows user to create a new pet or edit an existing one.
  */
 public class EditorActivity extends AppCompatActivity {
-
+    //private  PetDbHelper mDBHlper;
     /** EditText field to enter the pet's name */
     private EditText mNameEditText;
 
@@ -64,8 +72,37 @@ public class EditorActivity extends AppCompatActivity {
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
+      //  mDBHlper=new PetDbHelper(this);
     }
 
+    /*private void insertPet(){
+        SQLiteDatabase db=mDBHlper.getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(petContract.petEntry.COLUMN_PET_NAME,mNameEditText.getText().toString().trim());
+        contentValues.put(petContract.petEntry.COLUMN_PET_BREED,mBreedEditText.getText().toString().trim());
+        contentValues.put(petContract.petEntry.COLUMN_PET_GENDER,mGender);
+        contentValues.put(petContract.petEntry.COLUMN_PET_WEIGHT,Integer.parseInt(mWeightEditText.getText().toString().trim()));
+        long rowId=db.insert(petContract.petEntry.TABLE_NAME,null,contentValues);
+        Log.v("row Id","effected"+rowId);
+    }*/
+private void insertPet(){
+
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(petContract.petEntry.COLUMN_PET_NAME,mNameEditText.getText().toString().trim());
+        contentValues.put(petContract.petEntry.COLUMN_PET_BREED,mBreedEditText.getText().toString().trim());
+        contentValues.put(petContract.petEntry.COLUMN_PET_GENDER,mGender);
+        contentValues.put(petContract.petEntry.COLUMN_PET_WEIGHT,Integer.parseInt(mWeightEditText.getText().toString().trim()));
+    Uri newUri= getContentResolver().insert(petContract.petEntry.CONTENT_URI,contentValues);
+    if (newUri == null) {
+        // If the new content URI is null, then there was an error with insertion.
+        Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                Toast.LENGTH_SHORT).show();
+    } else {
+        // Otherwise, the insertion was successful and we can display a toast.
+        Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                Toast.LENGTH_SHORT).show();
+    }
+    }
     /**
      * Setup the dropdown spinner that allows the user to select the gender of the pet.
      */
@@ -119,7 +156,8 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                insertPet();
+                finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
